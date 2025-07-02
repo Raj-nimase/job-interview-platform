@@ -1,63 +1,108 @@
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
-const loginSchema = z.object({
-  email: z.string().email("Enter a valid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
+import React, { useState } from "react";
 
 const Login = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(loginSchema),
-  });
+  const [flipped, setFlipped] = useState(false);
 
-  const onSubmit = (data) => {
-    console.log("Login data", data);
-    // TODO: Send POST request to /api/auth/login
+  const handleSubmit = (e, isSignup) => {
+    e.preventDefault();
+    alert(isSignup ? "Registered Successfully!" : "Logged in Successfully!");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white shadow-md rounded-md p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block mb-1 font-medium">Email</label>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 to-purple-600">
+      <div
+        className={`relative w-[400px] h-[500px] transition-transform duration-700 transform-style-3d ${
+          flipped ? "rotate-y-180" : ""
+        }`}
+      >
+        {/* Sign Up Card */}
+        <div className="absolute w-full h-full bg-white rounded-2xl shadow-lg backface-hidden p-8">
+          <h2 className="text-2xl font-bold text-center mb-2">
+            Create Account
+          </h2>
+          <p className="text-sm text-center text-gray-500 mb-4">
+            Sign up with your details to get started!
+          </p>
+          <form onSubmit={(e) => handleSubmit(e, true)} className="space-y-4">
+            <input
+              type="text"
+              placeholder="Full Name"
+              required
+              className="w-full px-4 py-2 border rounded-md"
+            />
             <input
               type="email"
-              {...register("email")}
-              className="w-full border rounded px-3 py-2"
-              placeholder="you@example.com"
+              placeholder="Email"
+              required
+              className="w-full px-4 py-2 border rounded-md"
             />
-            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
-          </div>
-
-          <div>
-            <label className="block mb-1 font-medium">Password</label>
             <input
               type="password"
-              {...register("password")}
-              className="w-full border rounded px-3 py-2"
-              placeholder="••••••"
+              placeholder="Password"
+              required
+              className="w-full px-4 py-2 border rounded-md"
             />
-            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+            <button
+              type="submit"
+              className="w-full py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600"
+            >
+              Sign Up
+            </button>
+          </form>
+          <div
+            className="mt-4 text-center text-indigo-600 cursor-pointer"
+            onClick={() => setFlipped(true)}
+          >
+            Already have an account? Login
           </div>
+        </div>
 
-          <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-            Login
-          </button>
-        </form>
-
-        <p className="text-center text-sm mt-4">
-          Don't have an account? <Link to="/register" className="text-blue-600 hover:underline">Register</Link>
-        </p>
+        {/* Login Card */}
+        <div className="absolute w-full h-full bg-white rounded-2xl shadow-lg p-8 rotate-y-180 backface-hidden">
+          <h2 className="text-2xl font-bold text-center mb-2">Welcome Back</h2>
+          <p className="text-sm text-center text-gray-500 mb-4">
+            Login using your credentials
+          </p>
+          <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-4">
+            <input
+              type="email"
+              placeholder="Email"
+              required
+              className="w-full px-4 py-2 border rounded-md"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              required
+              className="w-full px-4 py-2 border rounded-md"
+            />
+            <button
+              type="submit"
+              className="w-full py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600"
+            >
+              Login
+            </button>
+          </form>
+          <div
+            className="mt-4 text-center text-indigo-600 cursor-pointer"
+            onClick={() => setFlipped(false)}
+          >
+            Don't have an account? Sign Up
+          </div>
+        </div>
       </div>
+
+      <style jsx>{`
+        .transform-style-3d {
+          transform-style: preserve-3d;
+        }
+        .backface-hidden {
+          backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+          transform: rotateY(180deg);
+        }
+      `}</style>
     </div>
   );
 };
