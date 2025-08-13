@@ -1,4 +1,6 @@
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import InterviewTips from "./Interviewtip";
 
 const features = [
   {
@@ -31,19 +33,61 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-center mb-8">Welcome to Your Dashboard 🎯</h1>
+    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] text-white p-6 font-sans">
+      {/* Welcome Card */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-5xl mx-auto mb-10 p-6 bg-white/10 backdrop-blur-md rounded-xl border border-cyan-500 shadow-lg flex items-center gap-6"
+      >
+        <img
+          src="https://api.dicebear.com/7.x/notionists-neutral/svg?seed=HireReady"
+          alt="Avatar"
+          className="w-20 h-20 rounded-full border-2 border-cyan-400 shadow"
+        />
+        <div>
+          <h1 className="text-3xl font-bold text-cyan-300">Welcome, HireReady ! 🚀</h1>
+          <p className="text-gray-300 text-sm">Get ready to ace your interviews with smart tools.</p>
+        </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      {/* Stats Summary */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-5 max-w-5xl mx-auto mb-10">
+        {[
+          { label: "Quizzes Taken", value: "12", color: "text-emerald-400" },
+          { label: "Resumes Built", value: "3", color: "text-yellow-400" },
+          { label: "Tips Read", value: "5", color: "text-blue-400" },
+          { label: "Profile Complete", value: "75%", color: "text-pink-400" },
+        ].map((stat, i) => (
+          <motion.div
+            key={i}
+            whileHover={{ scale: 1.05 }}
+           className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-xl shadow hover:border-cyan-400 hover:shadow-cyan-500/30 transition-all duration-100"
+          >
+            <h2 className={`text-xl font-bold ${stat.color}`}>{stat.value}</h2>
+            <p className="text-sm text-gray-300">{stat.label}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Feature Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
         {features.map((feature) => (
-          <div
+          <motion.div
             key={feature.name}
             onClick={() => navigate(feature.link)}
-            className="cursor-pointer bg-white shadow-md hover:shadow-lg transition p-6 rounded-lg border border-gray-200"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-xl shadow hover:border-cyan-400 hover:shadow-cyan-500/30 transition-all duration-100"
           >
-            <h2 className="text-xl font-semibold mb-1">{feature.emoji} {feature.name}</h2>
-            <p className="text-gray-600 text-sm">{feature.description}</p>
-          </div>
+            <h2 className="text-xl font-bold mb-1 text-white flex items-center">
+              <span className="mr-2">{feature.emoji}</span> {feature.name}
+            </h2>
+            <p className="text-gray-300 text-sm group-hover:text-white transition-colors">
+              {feature.description}
+            </p>
+          </motion.div>
         ))}
       </div>
     </div>
