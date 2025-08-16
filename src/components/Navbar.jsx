@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
 
 const Navbar = () => {
   const links = [
@@ -7,6 +7,7 @@ const Navbar = () => {
     { name: "Quiz", path: "/quiz" },
     { name: "Resume", path: "/resume" },
     { name: "Login", path: "/login" },
+    { name: "AI Interview", path: "/selectRole" },
   ];
 
   return (

@@ -1,32 +1,73 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import { Eye, EyeOff } from "lucide-react"; // For password toggle icons
+import { Eye, EyeOff } from "lucide-react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 
 const Login = () => {
   const [flipped, setFlipped] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSubmit = (e, isSignup) => {
+  // form states
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e, isSignup) => {
     e.preventDefault();
-    Swal.fire({
-      icon: "success",
-      title: isSignup ? "Registered Successfully!" : "Logged in Successfully!",
-      showConfirmButton: false,
-      timer: 2000,
-    });
+
+    const url = isSignup
+      ? "http://localhost:4000/api/auth/register"
+      : "http://localhost:4000/api/auth/login";
+
+    try {
+      const res = await axios.post(url, {
+        name: isSignup ? name : undefined,
+        email,
+        password,
+      });
+
+      console.log("Server Response:", res);
+      console.log("Response Data:", res.data);
+
+      Swal.fire({
+        icon: "success",
+        title: isSignup
+          ? "Registered Successfully!"
+          : "Logged in Successfully!",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+
+      // Save token & user
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      // Decode userId from token
+      const decoded = jwtDecode(res.data.token);
+      localStorage.setItem("userId", decoded.id);
+
+      navigate("/dashboard");
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data?.message || "Something went wrong",
+      });
+    }
   };
 
   return (
     <div
       className="flex items-center justify-center min-h-screen bg-cover bg-center relative"
       style={{
-        backgroundImage:
-          "url('public/photo/login.jpg')",
+        backgroundImage: "url('/photo/login.jpg')", // fixed path
       }}
     >
-      {/* <Lottie animationData={YOUR_ANIMATION_JSON} loop autoPlay className="absolute w-full h-full z-0" /> */}
-
       <div className="z-10 perspective-[1000px]">
         <div
           className={`relative w-[400px] h-[550px] transition-transform duration-700 transform-style-3d ${
@@ -38,19 +79,20 @@ const Login = () => {
             <h2 className="text-3xl font-bold text-center text-white mb-2">
               Create Account
             </h2>
-            <p className="text-sm text-white/80 text-center mb-4">
-              Sign up with your details to get started!
-            </p>
             <form onSubmit={(e) => handleSubmit(e, true)} className="space-y-4">
               <input
                 type="text"
                 placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
                 className="w-full px-4 py-2 rounded bg-white/10 border border-white/40 text-white focus:outline-none"
               />
               <input
                 type="email"
                 placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full px-4 py-2 rounded bg-white/10 border border-white/40 text-white focus:outline-none"
               />
@@ -58,6 +100,8 @@ const Login = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                   className="w-full px-4 py-2 pr-10 rounded bg-white/10 border border-white/40 text-white focus:outline-none"
                 />
@@ -76,10 +120,12 @@ const Login = () => {
                 />
                 <span className="text-sm">Remember me</span>
               </div>
-              <button type="submit" className="w-full py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded font-semibold shadow-lg hover:scale-105 active:scale-95 transition-transform duration-200">
-                  Sign Up
-            </button>
-
+              <button
+                type="submit"
+                className="w-full py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded font-semibold shadow-lg hover:scale-105 active:scale-95 transition-transform duration-200"
+              >
+                Sign Up
+              </button>
             </form>
             <div
               onClick={() => setFlipped(true)}
@@ -94,13 +140,15 @@ const Login = () => {
             <h2 className="text-3xl font-bold text-center text-white mb-2">
               Welcome Back
             </h2>
-            <p className="text-sm text-white/80 text-center mb-4">
-              Login using your credentials
-            </p>
-            <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-4">
+            <form
+              onSubmit={(e) => handleSubmit(e, false)}
+              className="space-y-4"
+            >
               <input
                 type="email"
                 placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full px-4 py-2 rounded bg-white/10 border border-white/40 text-white focus:outline-none"
               />
@@ -108,6 +156,8 @@ const Login = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                   className="w-full px-4 py-2 pr-10 rounded bg-white/10 border border-white/40 text-white focus:outline-none"
                 />
@@ -126,10 +176,12 @@ const Login = () => {
                 />
                 <span className="text-sm">Remember me</span>
               </div>
-              <button type="submit" className="w-full py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded font-semibold shadow-lg hover:scale-105 active:scale-95 transition-transform duration-200">
+              <button
+                type="submit"
+                className="w-full py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded font-semibold shadow-lg hover:scale-105 active:scale-95 transition-transform duration-200"
+              >
                 Login
               </button>
-
             </form>
             <div
               onClick={() => setFlipped(false)}
